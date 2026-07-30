@@ -3,63 +3,81 @@ const screen = document.getElementById("screen");
 const answerArea = document.getElementById("answerArea");
 
 let numbers = [];
-let index = 0;
+let current = 0;
 
-function randomNumber() {
+function randomPair() {
     return Math.floor(Math.random() * 100)
         .toString()
         .padStart(2, "0");
 }
 
-startBtn.onclick = function () {
+startBtn.onclick = () => {
 
     numbers = [];
-    index = 0;
+    current = 0;
 
-    let count = Number(document.getElementById("count").value);
+    const count = Number(document.getElementById("count").value);
 
     for (let i = 0; i < count; i++) {
-        numbers.push(randomNumber());
+        numbers.push(randomPair());
     }
 
-    startBtn.disabled = true;
+    startBtn.style.display = "none";
 
-    showNumbers();
+    showNext();
 
 };
 
-function showNumbers() {
+function showNext() {
 
-    let speed = Number(document.getElementById("speed").value);
+    const speed = Number(document.getElementById("speed").value);
 
-    if (index < numbers.length) {
-
-        screen.innerHTML = numbers[index];
-
-        index++;
-
-        setTimeout(showNumbers, speed);
-
-    } else {
+    if (current >= numbers.length) {
 
         screen.innerHTML = "";
 
-        answerArea.innerHTML = `
-        <textarea id="answer"
-        placeholder="Type numbers separated by spaces"></textarea>
+        showAnswerPage();
 
-        <button onclick="checkAnswer()">
-        Check
-        </button>
-        `;
-
+        return;
     }
+
+    screen.innerHTML = `
+        <div style="
+        font-size:120px;
+        font-weight:bold;
+        margin-top:40px;
+        ">
+        ${numbers[current]}
+        </div>
+    `;
+
+    current++;
+
+    setTimeout(showNext, speed);
 
 }
 
-function checkAnswer() {
+function showAnswerPage() {
 
-    let user = document
+    answerArea.innerHTML = `
+    <h2>Recall</h2>
+
+    <textarea
+    id="answer"
+    placeholder="07 54 81 23 ..."
+    ></textarea>
+
+    <button onclick="finishGame()">
+    Finish
+    </button>
+    `;
+
+}
+
+function finishGame() {
+
+    const user =
+        document
         .getElementById("answer")
         .value
         .trim()
@@ -67,34 +85,55 @@ function checkAnswer() {
 
     let correct = 0;
 
+    let report = "";
+
     for (let i = 0; i < numbers.length; i++) {
 
         if (user[i] === numbers[i]) {
 
             correct++;
 
+        } else {
+
+            report += `
+            <div style="
+            color:#ff7070;
+            margin:6px;
+            ">
+            ${i + 1}.
+            Correct:
+            <b>${numbers[i]}</b>
+            |
+            Yours:
+            <b>${user[i] || "--"}</b>
+            </div>
+            `;
+
         }
 
     }
 
-    let percent = Math.round(correct / numbers.length * 100);
+    const score =
+        Math.round(correct / numbers.length * 100);
 
-    answerArea.innerHTML += `
-    <h2 style="margin-top:20px">
-    Score: ${correct}/${numbers.length}
-    </h2>
+    answerArea.innerHTML = `
 
-    <h3>
-    Accuracy: ${percent}%
-    </h3>
+    <h2>Score</h2>
+
+    <h1>${score}%</h1>
+
+    <h3>${correct} / ${numbers.length}</h3>
 
     <br>
 
-    <b>Correct sequence</b>
+    <button onclick="location.reload()">
+    Play Again
+    </button>
 
     <br><br>
 
-    ${numbers.join(" ")}
+    ${report}
+
     `;
 
 }
