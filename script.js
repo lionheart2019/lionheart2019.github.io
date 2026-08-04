@@ -15,7 +15,11 @@ startBtn.onclick = () => {
 
     numbers = [];
     current = 0;
+const memorizeTime =
+Number(document.getElementById("memorizeTime").value);
 
+const recallTime =
+Number(document.getElementById("recallTime").value);
     const count = Number(document.getElementById("count").value);
 
     for (let i = 0; i < count; i++) {
@@ -24,8 +28,51 @@ startBtn.onclick = () => {
 
     startBtn.style.display = "none";
 
-    showNext();
+screen.innerHTML =
+numbers.join(" ");
 
+let timeLeft = memorizeTime;
+
+const timer = setInterval(() => {
+
+timeLeft--;
+
+screen.innerHTML =
+numbers.join(" ") +
+"<br><br><h2>Memorize: " +
+timeLeft +
+" sec</h2>";
+
+if(timeLeft <= 0){
+
+clearInterval(timer);
+
+screen.innerHTML="";
+
+showAnswerPage();
+
+let recall = recallTime;
+
+const recallTimer = setInterval(()=>{
+
+recall--;
+
+document.querySelector("h2").innerHTML =
+"Recall: " + recall + " sec";
+
+if(recall <= 0){
+
+clearInterval(recallTimer);
+
+finishGame();
+
+}
+
+},1000);
+
+}
+
+},1000);
 };
 
 function showNext() {
