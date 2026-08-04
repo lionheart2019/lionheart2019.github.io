@@ -63,8 +63,64 @@ document.querySelector("h2").innerHTML =
 if(recall <= 0){
 
 clearInterval(recallTimer);
+    function finishGame() {
 
-finishGame();
+    const user = document
+        .getElementById("answer")
+        .value
+        .trim()
+        .split(/\s+/);
+
+    let correct = 0;
+    let report = "";
+
+    for (let i = 0; i < numbers.length; i++) {
+
+        if (user[i] === numbers[i]) {
+
+            correct++;
+
+            report += `
+            <div style="color:#22c55e;margin:6px;">
+            ${i + 1}. ✔ ${numbers[i]}
+            </div>
+            `;
+
+        } else {
+
+            report += `
+            <div style="color:#ff7070;margin:6px;">
+            ${i + 1}. ✘
+            الصحيح: <b>${numbers[i]}</b>
+            |
+            إجابتك: <b>${user[i] || "--"}</b>
+            </div>
+            `;
+
+        }
+
+    }
+
+    const score = Math.round(correct / numbers.length * 100);
+
+    answerArea.innerHTML = `
+    <h2>النتيجة</h2>
+
+    <h1>${score}%</h1>
+
+    <h3>${correct} / ${numbers.length}</h3>
+
+    <button onclick="location.reload()">
+    العب مرة أخرى
+    </button>
+
+    <hr>
+
+    ${report}
+    `;
+    }
+
+
 
 }
 
