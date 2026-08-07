@@ -66,9 +66,18 @@ color:#fbbf24;
 
 #screen{
 display:grid;
-grid-template-columns:repeat(auto-fill,minmax(70px,1fr));
-gap:10px;
+grid-template-columns:repeat(10,1fr);
+gap:8px;
 margin-top:20px;
+}
+
+.number{
+background:#1e3a8a;
+padding:14px;
+font-size:28px;
+font-weight:bold;
+text-align:center;
+border-radius:8px;
 }
 
 .number{
