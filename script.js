@@ -1,9 +1,11 @@
 const startBtn = document.getElementById("start");
 const screen = document.getElementById("screen");
+const timer = document.getElementById("timer");
 const answerArea = document.getElementById("answerArea");
 
 let numbers = [];
-let current = 0;
+let memorizeSeconds = 0;
+let recallSeconds = 0;
 
 function randomPair() {
     return Math.floor(Math.random() * 100)
@@ -11,204 +13,161 @@ function randomPair() {
         .padStart(2, "0");
 }
 
-startBtn.onclick = () => {
+startBtn.onclick = function () {
 
     numbers = [];
-    current = 0;
-const memorizeTime =
-Number(document.getElementById("memorizeTime").value);
+    screen.innerHTML = "";
+    answerArea.innerHTML = "";
 
-const recallTime =
-Number(document.getElementById("recallTime").value);
     const count = Number(document.getElementById("count").value);
+
+    memorizeSeconds = Number(
+        document.getElementById("memorizeTime").value
+    );
+
+    recallSeconds = Number(
+        document.getElementById("recallTime").value
+    );
 
     for (let i = 0; i < count; i++) {
         numbers.push(randomPair());
     }
 
-    startBtn.style.display = "none";
+    showNumbers();
 
-screen.innerHTML =
-numbers.join(" ");
+};
 
-let timeLeft = memorizeTime;
+function showNumbers() {
 
-const timer = setInterval(() => {
+    screen.innerHTML = "";
 
-timeLeft--;
+    numbers.forEach(n => {
 
-screen.innerHTML =
-numbers.join(" ") +
-"<br><br><h2>Memorize: " +
-timeLeft +
-" sec</h2>";
+        screen.innerHTML +=
+        `<div class="number">${n}</div>`;
 
-if(timeLeft <= 0){
+    });
 
-clearInterval(timer);
+    startMemorizeTimer();
 
-screen.innerHTML="";
+}
 
-showAnswerPage();
+function startMemorizeTimer() {
 
-let recall = recallTime;
+    let time = memorizeSeconds;
 
-const recallTimer = setInterval(()=>{
+    timer.innerHTML =
+    "Memorize: " + formatTime(time);
 
-recall--;
+    const interval = setInterval(() => {
 
-document.querySelector("h2").innerHTML =
-"Recall: " + recall + " sec";
+        time--;
 
-if(recall <= 0){
+        timer.innerHTML =
+        "Memorize: " + formatTime(time);
 
-clearInterval(recallTimer);
-    function finishGame() {
+        if (time <= 0) {
 
-    const user = document
-        .getElementById("answer")
-        .value
-        .trim()
-        .split(/\s+/);
+            clearInterval(interval);
 
-    let correct = 0;
-    let report = "";
-
-    for (let i = 0; i < numbers.length; i++) {
-
-        if (user[i] === numbers[i]) {
-
-            correct++;
-
-            report += `
-            <div style="color:#22c55e;margin:6px;">
-            ${i + 1}. ✔ ${numbers[i]}
-            </div>
-            `;
-
-        } else {
-
-            report += `
-            <div style="color:#ff7070;margin:6px;">
-            ${i + 1}. ✘
-            الصحيح: <b>${numbers[i]}</b>
-            |
-            إجابتك: <b>${user[i] || "--"}</b>
-            </div>
-            `;
+            startRecall();
 
         }
 
-    }
+    },1000);
 
-    const score = Math.round(correct / numbers.length * 100);
+}
+
+function formatTime(sec){
+
+    const m =
+    Math.floor(sec/60);
+
+    const s =
+    sec%60;
+
+    return String(m).padStart(2,"0")
+    + ":"
+    + String(s).padStart(2,"0");
+
+}
+function startRecall() {
+
+    screen.innerHTML = "";
+
+    timer.innerHTML =
+    "Recall: " + formatTime(recallSeconds);
 
     answerArea.innerHTML = `
-    <h2>النتيجة</h2>
-
-    <h1>${score}%</h1>
-
-    <h3>${correct} / ${numbers.length}</h3>
-
-    <button onclick="location.reload()">
-    العب مرة أخرى
-    </button>
-
-    <hr>
-
-    ${report}
-    `;
-    }
-
-
-
-}
-
-},1000);
-
-}
-
-},1000);
-};
-
-function showNext() {
-
-    const speed = Number(document.getElementById("speed").value);
-
-    if (current >= numbers.length) {
-
-        screen.innerHTML = "";
-
-        showAnswerPage();
-
-        return;
-    }
-
-    screen.innerHTML = `
-        <div style="
-        font-size:120px;
-        font-weight:bold;
-        margin-top:40px;
-        ">
-        ${numbers[current]}
-        </div>
-    `;
-
-    current++;
-
-    setTimeout(showNext, speed);
-
-}
-
-function showAnswerPage() {
-
-    answerArea.innerHTML = `
-    <h2>Recall</h2>
-
-    <textarea
-    id="answer"
-    placeholder="07 54 81 23 ..."
-    ></textarea>
+    <textarea id="answer"
+    placeholder="اكتب الأرقام بنفس الترتيب، وافصل بينها بمسافة"></textarea>
 
     <button onclick="finishGame()">
     Finish
     </button>
     `;
 
+    let time = recallSeconds;
+
+    const interval = setInterval(() => {
+
+        time--;
+
+        timer.innerHTML =
+        "Recall: " + formatTime(time);
+
+        if (time <= 0) {
+
+            clearInterval(interval);
+
+            finishGame();
+
+        }
+
+    },1000);
+
 }
 
 function finishGame() {
 
-    const user =
-        document
-        .getElementById("answer")
-        .value
+    const textarea =
+    document.getElementById("answer");
+
+    let user = [];
+
+    if(textarea){
+
+        user = textarea.value
         .trim()
         .split(/\s+/);
+
+    }
 
     let correct = 0;
 
     let report = "";
 
-    for (let i = 0; i < numbers.length; i++) {
+    for(let i=0;i<numbers.length;i++){
 
-        if (user[i] === numbers[i]) {
+        if(user[i]===numbers[i]){
 
             correct++;
 
-        } else {
+            report += `
+            <div class="correct">
+            ${i+1}. ✔ ${numbers[i]}
+            </div>
+            `;
+
+        }else{
 
             report += `
-            <div style="
-            color:#ff7070;
-            margin:6px;
-            ">
-            ${i + 1}.
-            Correct:
-            <b>${numbers[i]}</b>
+            <div class="wrong">
+            ${i+1}. ✘
+            الصحيح: <b>${numbers[i]}</b>
             |
-            Yours:
-            <b>${user[i] || "--"}</b>
+            إجابتك:
+            <b>${user[i]||"--"}</b>
             </div>
             `;
 
@@ -217,15 +176,27 @@ function finishGame() {
     }
 
     const score =
-        Math.round(correct / numbers.length * 100);
+    Math.round(correct/numbers.length*100);
+
+    const best =
+    Number(localStorage.getItem("bestScore")||0);
+
+    if(score>best){
+
+        localStorage.setItem("bestScore",score);
+
+    }
 
     answerArea.innerHTML = `
+    <div class="result">
 
-    <h2>Score</h2>
-
-    <h1>${score}%</h1>
+    <h2>Score: ${score}%</h2>
 
     <h3>${correct} / ${numbers.length}</h3>
+
+    <h3>Best Score:
+    ${localStorage.getItem("bestScore")}%
+    </h3>
 
     <br>
 
@@ -233,10 +204,11 @@ function finishGame() {
     Play Again
     </button>
 
-    <br><br>
+    <hr><br>
 
     ${report}
 
+    </div>
     `;
 
-}
+        }
