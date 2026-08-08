@@ -91,6 +91,7 @@ function formatTime(sec){
     + String(s).padStart(2,"0");
 
 }
+
 function startRecall() {
 
     screen.innerHTML = "";
@@ -98,25 +99,70 @@ function startRecall() {
     timer.innerHTML =
     "Recall: " + formatTime(recallSeconds);
 
-    answerArea.innerHTML = `
-    <textarea id="answer"
-    placeholder="اكتب الأرقام بنفس الترتيب، وافصل بينها بمسافة"></textarea>
+    let html = '<div id="inputs" style="display:grid;grid-template-columns:repeat(10,1fr);gap:8px;">';
 
-    <button onclick="finishGame()">
+    for(let i=0;i<numbers.length;i++){
+
+        html += `
+        <input
+        class="cell"
+        maxlength="2"
+        data-index="${i}"
+        style="
+        padding:10px;
+        text-align:center;
+        font-size:22px;
+        border-radius:6px;
+        border:none;
+        "
+        >
+        `;
+
+    }
+
+    html += "</div>";
+
+    html += `
+    <button
+    style="margin-top:20px;"
+    onclick="finishGame()">
     Finish
     </button>
     `;
 
+    answerArea.innerHTML = html;
+
+    const cells =
+    document.querySelectorAll(".cell");
+
+    cells.forEach((cell,index)=>{
+
+        cell.addEventListener("input",()=>{
+
+            if(cell.value.length==2){
+
+                if(index<cells.length-1){
+
+                    cells[index+1].focus();
+
+                }
+
+            }
+
+        });
+
+    });
+
     let time = recallSeconds;
 
-    const interval = setInterval(() => {
+    const interval = setInterval(()=>{
 
         time--;
 
         timer.innerHTML =
         "Recall: " + formatTime(time);
 
-        if (time <= 0) {
+        if(time<=0){
 
             clearInterval(interval);
 
@@ -127,19 +173,20 @@ function startRecall() {
     },1000);
 
 }
-
 function finishGame() {
 
     const textarea =
-    document.getElementById("answer");
+document.getElementById("answer");
 
-    let user = [];
+let user = [];
 
-    if(textarea){
+if(textarea){
 
-        user = textarea.value
-        .trim()
-        .split(/\s+/);
+user = textarea.value
+.trim()
+.split(/\s+/);
+
+}
 
     }
 
